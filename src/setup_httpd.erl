@@ -16,32 +16,32 @@
 -export([handle_setup_req/1]).
 
 handle_setup_req(#httpd{method='POST'}=Req) ->
-    ok = chttpd:verify_is_server_admin(Req),
+    ok = couch_httpd:verify_is_server_admin(Req),
     couch_httpd:validate_ctype(Req, "application/json"),
     Setup = get_body(Req),
     couch_log:notice("Setup: ~p~n", [Setup]),
     Action = binary_to_list(couch_util:get_value(<<"action">>, Setup, <<"missing">>)),
     case handle_action(Action, Setup) of
     ok ->
-        chttpd:send_json(Req, 201, {[{ok, true}]});
+        couch_httpd:send_json(Req, 201, {[{ok, true}]});
     {error, Message} ->
         couch_httpd:send_error(Req, 400, <<"bad_request">>, Message)
     end;
 handle_setup_req(#httpd{method='GET'}=Req) ->
-    ok = chttpd:verify_is_server_admin(Req),
+    ok = couch_httpd:verify_is_server_admin(Req),
     case setup:is_cluster_enabled() of
         no ->
-            chttpd:send_json(Req, 200, {[{state, cluster_disabled}]});
+            couch_httpd:send_json(Req, 200, {[{state, cluster_disabled}]});
         ok ->
             case setup:has_cluster_system_dbs() of
                 no ->
-                    chttpd:send_json(Req, 200, {[{state, cluster_enabled}]});
+                    couch_httpd:send_json(Req, 200, {[{state, cluster_enabled}]});
                 ok ->
-                    chttpd:send_json(Req, 200, {[{state, cluster_finished}]})
+                    couch_httpd:send_json(Req, 200, {[{state, cluster_finished}]})
             end
     end;
 handle_setup_req(#httpd{}=Req) ->
-    chttpd:send_method_not_allowed(Req, "GET,POST").
+    couch_httpd:send_method_not_allowed(Req, "GET,POST").
 
 
 get_options(Options, Setup) ->
