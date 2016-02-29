@@ -30,7 +30,7 @@ app() ->
 
 providers() ->
     [
-         {chttpd_handlers, setup_httpd_handlers}
+         {http_clustered_handlers, setup_httpd_handlers}
     ].
 
 services() ->
